@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "StereoKitApp": {
+      "commandName": "Project",
+      "remoteDebugEnabled": false
+    }
+  }
+}
