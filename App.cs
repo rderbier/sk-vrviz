@@ -15,16 +15,13 @@ namespace StereoKitApp
 			displayPreference = DisplayMode.MixedReality
 		};
 
-		Pose  objPose = new Pose(0, 0, -0.5f, Quat.Identity);
-		Model obj;
+		Pose objPose;
+		SmartSphere obj;
 		Matrix4x4 floorTransform = Matrix.TS(new Vector3(0, -1.5f, 0), new Vector3(20, 0.1f, 20));
 		Material  floorMaterial;
 		private Pose windowAdminPose;
 		private Sprite powerSprite;
-		private TargetGroup targetGroup = new TargetGroup();
-		private Target currentTarget;
 		private Material targetMaterial, seenMaterial, selectedMaterial, earthMaterial;
-		private float targetDiameter = 0.1f;
 		private void initSharedResources()
 		{
 			
@@ -58,25 +55,13 @@ namespace StereoKitApp
 			UI.ColorScheme = uiColor;
 			windowAdminPose = new Pose(-.2f, 0, -0.65f, Quat.LookAt(new Vec3(-.2f, 0, -0.5f), Input.Head.position, Vec3.Up));
 		}
-		public void addTarget(Pose pose, float diameter, String name = null)
-		{
-			targetGroup.addTarget(pose, diameter, name, targetMaterial, seenMaterial, selectedMaterial);
-			
-		}
+
 		private Boolean displayAdminPanel()
 		{
 			Boolean running = true;
 			UI.WindowBegin("Admin", ref this.windowAdminPose, new Vec2(25, 0) * U.cm, UIWin.Normal);
 			UI.Text("Admin Panel ");
 			
-				if (UI.Button("Add target"))
-				{
-					Pose targetPose = new Pose(this.windowAdminPose.position + Vec3.Cross(Vec3.Up, this.windowAdminPose.Forward) * 30 * U.cm, Quat.Identity);
-
-					// TO DO : create a target just next to the Admin panel 
-					addTarget(targetPose, targetDiameter);
-				    Log.Info("target added");
-			}
 				
 
 			UI.NextLine();
@@ -92,9 +77,10 @@ namespace StereoKitApp
 			Log.Subscribe(OnLog);
 			// Create assets used by the app
 			// Mesh.GenerateRoundedCube(Vec3.One * 0.1f, 0.02f),
-			obj = Model.FromMesh(
-				MeshUtils.generateUVSphere(1.0f, 60, 32),
-				earthMaterial) ;
+			SmartSphere.Init();
+			var pose = new Pose(0, 0, -1.0f, Quat.Identity);
+			obj = new SmartSphere(pose, earthMaterial);		
+
 
 			floorMaterial = new Material(Shader.FromFile("floor.hlsl"));
 			floorMaterial.Transparency = Transparency.Blend;
@@ -108,17 +94,16 @@ namespace StereoKitApp
 			Boolean running = this.displayAdminPanel();
 			LogWindow();
 
-			UI.Handle("Cube", ref objPose, obj.Bounds);
-			obj.Draw(objPose.ToMatrix());
+			
+			obj.Draw();
 
-			targetGroup.draw();
 
 			if (running == false )
             {
 				SK.Quit();
 			}
 		}
-		static Pose logPose = new Pose(0, -0.1f, 0.5f, Quat.LookDir(Vec3.Forward));
+		static Pose logPose = new Pose(0.8f, -0.1f, -0.5f, Quat.LookDir(Vec3.Forward));
 		static List<string> logList = new List<string>();
 		static string logText = "";
 		static void OnLog(LogLevel level, string text)
