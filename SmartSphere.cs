@@ -39,7 +39,7 @@ namespace RDR
 
             this.scale = scale;
             this.name = (name != null) ? name : "target-" + Guid.NewGuid().ToString();
-            this.isDraggable = false;
+            this.isDraggable = true;
 
         }
        
@@ -110,7 +110,7 @@ namespace RDR
                             // Matrix m = Matrix.R(rotation);
                             //this.pose.orientation = rotation * this.pose.orientation;
                             this.pose = new Pose(this.pose.position, rotation * this.pose.orientation);
-                            Log.Warn("rotate "+alpha);
+                            // Log.Warn("rotate "+alpha);
                             slidePosition = fingertip;
                         }
                     }
