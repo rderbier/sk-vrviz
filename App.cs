@@ -22,6 +22,7 @@ namespace StereoKitApp
 		private Pose windowAdminPose;
 		private Sprite powerSprite;
 		private Material targetMaterial, seenMaterial, selectedMaterial, earthMaterial;
+		private GraphSchema graphSchema;
 		private void initSharedResources()
 		{
 			
@@ -53,7 +54,7 @@ namespace StereoKitApp
 			// Renderer.SkyLight = lighting;
 			Color uiColor = Color.HSV(.83f, 0.33f, 1f, 0.8f);
 			UI.ColorScheme = uiColor;
-			windowAdminPose = new Pose(-.2f, 0, -0.65f, Quat.LookAt(new Vec3(-.2f, 0, -0.5f), Input.Head.position, Vec3.Up));
+			windowAdminPose = new Pose(-.2f, 0, -0.65f, Quat.LookAt(new Vec3(-.2f, 0, -0.65f), Input.Head.position, Vec3.Up));
 		}
 
 		private Boolean displayAdminPanel()
@@ -70,7 +71,7 @@ namespace StereoKitApp
 			UI.WindowEnd();
 			return running;
 		}
-		public void Init()
+		public async void Init()
 		{
 			this.initSharedResources();
 			this.initUI();
@@ -79,11 +80,17 @@ namespace StereoKitApp
 			// Mesh.GenerateRoundedCube(Vec3.One * 0.1f, 0.02f),
 			SmartSphere.Init();
 			var pose = new Pose(0, 0, -1.0f, Quat.Identity);
-			obj = new SmartSphere(pose, earthMaterial);		
+			obj = new SmartSphere(pose, earthMaterial);
 
-
+			
 			floorMaterial = new Material(Shader.FromFile("floor.hlsl"));
 			floorMaterial.Transparency = Transparency.Blend;
+			graphSchema = await Graphquery.GetSchema();
+			foreach(TypeElement t in graphSchema.types)
+            {
+				Log.Warn(t.name);
+			}
+			
 		}
 
 		public void Step()
@@ -103,7 +110,7 @@ namespace StereoKitApp
 				SK.Quit();
 			}
 		}
-		static Pose logPose = new Pose(0.8f, -0.1f, -0.5f, Quat.LookDir(Vec3.Forward));
+		static Pose logPose = new Pose(0.8f, -0.1f, -0.5f, Quat.LookAt(new Vec3(0.8f, -0.1f, -0.5f), Input.Head.position, Vec3.Up));
 		static List<string> logList = new List<string>();
 		static string logText = "";
 		static void OnLog(LogLevel level, string text)
